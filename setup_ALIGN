@@ -1,0 +1,20 @@
+setenv CC /home/apps/common/gcc/8.2.0/bin/gcc
+setenv CXX /home/apps/common/gcc/8.2.0/bin/g++
+module load gcc/8.2.0
+module load apps/python/3.8
+cd ..
+git clone https://github.com/ALIGN-analoglayout/ALIGN-public.git
+cd ALIGN-public
+setenv ALIGN_HOME $PWD
+setenv VENV $ALIGN_HOME/general
+python3 -m venv $VENV
+source $VENV/bin/activate.csh
+python -m pip install --upgrade pip
+pip install setuptools wheel pybind11 scikit-build cmake ninja
+pip install pytest pytest-cov pytest-xdist pytest-timeout pytest-cpp
+pip install -v -e .\[test\] --no-build-isolation
+pip install -v --no-build-isolation -e . --no-deps --install-option='--build-type=Release'
+rehash
+cd Viewer
+python3 -m http.server 8086 &
+cd ..
