@@ -1,4 +1,4 @@
-from .canvas import DefaultCanvas
+from align.primitive.default.canvas import DefaultCanvas
 from align.cell_fabric.generators import *
 from align.cell_fabric.grid import *
 
