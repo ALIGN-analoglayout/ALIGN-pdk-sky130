@@ -9,5 +9,5 @@ m10 net012 vbiasp2 vdd vdd pmos_rvt w=840e-9 l=150e-9 nf=2
 m9 net06 vbiasp2 vdd vdd pmos_rvt w=840e-9 l=150e-9 nf=2
 m4 net014 vinn net10 0 nmos_rvt w=840e-9 l=150e-9 nf=4
 m3 net8 vinp net10 0 nmos_rvt w=840e-9 l=150e-9 nf=4
-.ends ota
+.ends telescopic_ota
 ** End of subcircuit definition.
