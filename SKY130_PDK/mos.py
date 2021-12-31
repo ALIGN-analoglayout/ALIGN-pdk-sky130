@@ -299,10 +299,3 @@ class MOSGenerator(DefaultCanvas):
         self.addRegion( self.nwell, None, (1, -1), 0, (x_cells*self.gatesPerUnitCell+2*self.gateDummy*self.shared_diff-1, -1), y_cells* self.finsPerUnitCell+self.bodyswitch*self.pdk['Active']['Body_nfin'])
         if self.bodyswitch==1:self.addRegion( self.nselect, None, (1, -1), y_cells* self.finsPerUnitCell, (x_cells*self.gatesPerUnitCell+2*self.gateDummy*self.shared_diff-1, -1), y_cells* self.finsPerUnitCell+self.bodyswitch*self.pdk['Active']['Body_nfin'])
 
-
-# Default Cap & Res generators are good enough
-#CapGenerator = default.CapGenerator
-#ResGenerator = default.ResGenerator
-#RingGenerator = default.RingGenerator
-# Default Via Array generator is good enough
-#ViaArrayGenerator = default.ViaArrayGenerator
