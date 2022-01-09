@@ -114,8 +114,8 @@ class MOSGenerator(DefaultCanvas):
             
         # Draw FEOL Layers
         self.addWire( self.active, None, y, (x,1), (x+1,-1))
-        for i in range(self.gatesPerUnitCell):
-            self.addWire( self.pl, None, self.gatesPerUnitCell*x+self.gateDummy*self.shared_diff+i,   (y,1), (y+1,-1))
+        for i in range(self.gate):
+            self.addWire( self.pl, None, i+self.gatesPerUnitCell*x+self.gateDummy,   (y,1), (y+1,-1))
 
         def _addRVT(x, y, x_cells):
             pass
