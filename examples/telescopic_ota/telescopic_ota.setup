@@ -1,0 +1,4 @@
+POWER = vdd
+GND = 0
+CLOCK =
+DIGITAL =
