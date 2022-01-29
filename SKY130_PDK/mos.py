@@ -107,7 +107,7 @@ class MOSGenerator(DefaultCanvas):
 
         def _connect_diffusion(i, pin):
             self.addWire( self.m1, None, i, (grid_y0, -1), (grid_y1, 1))
-            for j in range(1,self.v0.h_clg.n): ## self.v0.h_clg.n??
+            for j in range(1,self.v0.h_clg.n-1): ## self.v0.h_clg.n??
                 self.addVia( self.v0, f'{fullname}:{pin}', i, (y, j))
             self._xpins[name][pin].append(i)
             
