@@ -10,8 +10,8 @@
 .subckt DCDC_XSW_PMOS VPB clk clkb vIN vOUT0 vOUT1
 *ALIGN (SPICE syntax): *all nmos/pmos starts with M thus changed the prefix here
 *ALIGN (SPICE syntax): does not support floating ports (VGND is not connected to anything in this subckt)
-*AssertionError (sizing): Width of device should be multiple of fin pitch (210e-9)
-*AssertionError (sizing): align modification width should <= 2100e-9 larger size should be designed using m
+*ALIGN (sizing): Width of device should be multiple of fin pitch (210e-9)
+*ALIGN (sizing): align modification width should <= 2100e-9 larger size should be designed using m
 M0 int_sw0 int_sw1 vIN VPB sky130_fd_pr__pfet_01v8 w=420e-9 l=150e-9
 M1 int_sw1 int_sw0 vIN VPB sky130_fd_pr__pfet_01v8 w=420e-9 l=150e-9
 M2 vOUT0 int_sw0 vIN VPB sky130_fd_pr__pfet_01v8 w=420e-9 l=150e-9 m=10
