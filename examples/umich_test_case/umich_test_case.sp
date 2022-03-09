@@ -11,7 +11,7 @@
 *ALIGN (SPICE syntax): *all nmos/pmos starts with M thus changed the prefix here
 *ALIGN (SPICE syntax): does not support floating ports (VGND is not connected to anything in this subckt)
 *AssertionError (sizing): Width of device should be multiple of fin pitch (210e-9)
-*AssertionError: align modification width should <= 2100e-9 larger size should be designed using m
+*AssertionError (sizing): align modification width should <= 2100e-9 larger size should be designed using m
 M0 int_sw0 int_sw1 vIN VPB sky130_fd_pr__pfet_01v8 w=420e-9 l=150e-9
 M1 int_sw1 int_sw0 vIN VPB sky130_fd_pr__pfet_01v8 w=420e-9 l=150e-9
 M2 vOUT0 int_sw0 vIN VPB sky130_fd_pr__pfet_01v8 w=420e-9 l=150e-9 m=10
@@ -45,7 +45,7 @@ M1  VOUT SEL_INV VIN VPWR sky130_fd_pr__pfet_01v8 w=630e-9 l=150e-9 m=80
 M2  VOUT SEL     VIN VGND sky130_fd_pr__nfet_01v8 w=630e-9 l=150e-9 m=80
 .ends DCDC_MUX_TGATE
 
-*align modification: a top level subcircuit need to be defined for which layout needs to be generated
+*ALIGN (SPICE syntax): a top level subcircuit need to be defined for which layout needs to be generated
 .subckt umich_test_case VGND VNB VPB VPWR
 x0 VPB clk clkb vIN vOUT0 vOUT1 DCDC_XSW_PMOS
 x1 VNB clk clkb vIN vOUT0 vOUT1 DCDC_XSW_NMOS
