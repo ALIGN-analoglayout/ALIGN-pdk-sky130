@@ -56,6 +56,15 @@ class CapGenerator(DefaultCanvas):
 
         logger.debug( f"Pitches {c_m1_p} {c_m2_p} {m1_p} {m2_p}")
 
+        m3n_xwidth = x_length + 2*self.pdk['Cap']['']
+        m3n_ywidth = y_length + 2*self.pdk['Cap']['']
+        m3n = Wire( 'm3n', 'M3', 'v',
+                                     clg=ColoredCenterLineGrid( colors=[], pitch=self.pdk['Cap']['m3Pitch'], width=m3n_width, offset=m3n_width//2),
+                                     spg=EnclosureGrid(pitch=m3n_ywidth, stoppoint=self.pdk['Cap'][''], check=False))
+        mimcap = Wire( 'mim', 'MIMCap', 'v',
+                                     clg=ColoredCenterLineGrid( colors=[], pitch=self.pdk['Cap']['m3Pitch'], width=x_length, offset=x_length//2),
+                                     spg=EnclosureGrid(pitch=y_length, stoppoint=self.pdk['Cap'][''], check=False))
+
         def compute( l, p, w):
             # this is nonsense but if l is a multiple of 2p say 2kp, then 2kp+p-w/(2p) is always k
             return int( 2*round(  (l+p-w)/(2.0*p) ))
