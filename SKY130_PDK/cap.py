@@ -22,65 +22,53 @@ class CapGenerator(DefaultCanvas):
         self.m3n = self.addGen( Wire( 'm3n', 'M3', 'v',
                                      clg=ColoredCenterLineGrid( colors=['c1','c2'], pitch=self.pdk['Cap']['m3Pitch'], width=self.pdk['Cap']['m3Width']),
                                      spg=EnclosureGrid(pitch=self.pdk['M2']['Pitch'], stoppoint=self.pdk['V2']['VencA_H'] + self.pdk['M2']['Width']//2, check=False)))
+        
+        m5_offset = self.pdk['MIMCap']['Enclosure'] + self.pdk['MIMCapC']['Enclosure'] + self.pdk['MIMCapC']['WidthX']//2
+        self.m5n = self.addGen(Wire( 'm5n', 'M5', 'v',
+                                     clg=ColoredCenterLineGrid( colors=[], pitch=2*self.pdk['Cap']['m5Width'], width=self.pdk['Cap']['m5Width'], offset=m5_offset),
+                                     spg=EnclosureGrid(pitch=self.pdk['M4']['Pitch'], stoppoint=0, check=False)))
 
         self.Cboundary = self.addGen( Region( 'Cboundary', 'Cboundary', h_grid=self.m2.clg, v_grid=self.m1.clg))
 
-        self.v1_xn = self.addGen( Via( 'v1_xn', 'V1',
-                                        h_clg=self.m2n.clg, v_clg=self.m1.clg,
-                                        WidthX=self.v1.WidthX, WidthY=self.v1.WidthY,
-                                        h_ext=self.v1.h_ext, v_ext=self.v1.v_ext))
-        self.v1_nx = self.addGen( Via( 'v1_nx', 'V1',
-                                        h_clg=self.m2.clg, v_clg=self.m1n.clg,
-                                        WidthX=self.v1.WidthX, WidthY=self.v1.WidthY,
-                                        h_ext=self.v1.h_ext, v_ext=self.v1.v_ext))
-        self.v2_xn = self.addGen( Via( 'v2_xn', 'V2',
-                                        h_clg=self.m2n.clg, v_clg=self.m3.clg,
-                                        WidthX=self.v2.WidthX, WidthY=self.v2.WidthY,
-                                        h_ext=self.v2.h_ext, v_ext=self.v2.v_ext))
-        self.v2_nx = self.addGen( Via( 'v2_nx', 'V2',
-                                        h_clg=self.m2.clg, v_clg=self.m3n.clg,
-                                        WidthX=self.v2.WidthX, WidthY=self.v2.WidthY,
-                                        h_ext=self.v2.h_ext, v_ext=self.v2.v_ext))
+        self.v_MIMCapC = self.addGen( Via( 'v_MIMCapC', 'MIMCapC',
+                                        h_clg=self.m4.clg, v_clg=self.m5n.clg,
+                                        WidthX=self.pdk['MIMCapC']['WidthX'], WidthY=self.pdk['MIMCapC']['WidthY'],
+                                        h_ext=self.v4.h_ext, v_ext=self.v4.v_ext))
+
+        self.v4_x = self.addGen( Via( 'v4_x', 'V4',
+                                        h_clg=self.m4.clg, v_clg=self.m5n.clg,
+                                        WidthX=self.v4.WidthX, WidthY=self.v4.WidthY,
+                                        h_ext=self.v4.h_ext, v_ext=self.v4.v_ext))
 
     def addCap( self, unit_cap):
 
         x_length = float((math.sqrt(unit_cap/2))*1000)
         y_length = float((math.sqrt(unit_cap/2))*1000)  
 
-        c_m1_p = self.pdk['Cap']['m1Pitch']
-        c_m1_w = self.pdk['Cap']['m1Width']
-        c_m2_p = self.pdk['Cap']['m2Pitch']
-        c_m2_w = self.pdk['Cap']['m2Width']
         m1_p = self.pdk['M1']['Pitch']
         m2_p = self.pdk['M2']['Pitch']
 
-        logger.debug( f"Pitches {c_m1_p} {c_m2_p} {m1_p} {m2_p}")
+        m4n_xwidth = x_length + 2*self.pdk['MIMCap']['Enclosure']
+        m4n_ywidth = y_length + 2*self.pdk['MIMCap']['Enclosure']
+        
+        m4n = Wire( 'm4n', 'M4', 'v',
+                                     clg=ColoredCenterLineGrid( colors=[], pitch=, width=m4n_width, offset=m4n_width//2),
+                                     spg=EnclosureGrid(pitch=m4n_ywidth, stoppoint=self.pdk['MIMCap']['Enclosure'], check=False))
+        #mimcap = Wire( 'mim', 'MIMCap', 'v',
+        #                             clg=ColoredCenterLineGrid( colors=[], pitch=self.pdk['Cap']['m4Pitch'], width=x_length, offset=x_length//2),
+        #                             spg=EnclosureGrid(pitch=y_length, stoppoint=0, check=False))
 
-        m3n_xwidth = x_length + 2*self.pdk['Cap']['']
-        m3n_ywidth = y_length + 2*self.pdk['Cap']['']
-        m3n = Wire( 'm3n', 'M3', 'v',
-                                     clg=ColoredCenterLineGrid( colors=[], pitch=self.pdk['Cap']['m3Pitch'], width=m3n_width, offset=m3n_width//2),
-                                     spg=EnclosureGrid(pitch=m3n_ywidth, stoppoint=self.pdk['Cap'][''], check=False))
-        mimcap = Wire( 'mim', 'MIMCap', 'v',
-                                     clg=ColoredCenterLineGrid( colors=[], pitch=self.pdk['Cap']['m3Pitch'], width=x_length, offset=x_length//2),
-                                     spg=EnclosureGrid(pitch=y_length, stoppoint=self.pdk['Cap'][''], check=False))
+        '''def compute( l, p):
+            return int( 2*round(  (l+p-w)/(2.0*p) ))'''
 
-        def compute( l, p, w):
-            # this is nonsense but if l is a multiple of 2p say 2kp, then 2kp+p-w/(2p) is always k
-            return int( 2*round(  (l+p-w)/(2.0*p) ))
-
-        x_number = compute( x_length, c_m1_p, c_m1_w)
-        y_number = compute( y_length, c_m2_p, c_m2_w)
+        x_number = ceil(m4n_xwidth/m1_p)
+        y_number = ceil( m4n_ywidth/m2_p)
 
         logger.debug( f"Number of wires {x_number} {y_number}")
 
-        def roundup( x, p):
-            return (x+p-1)//p
+        self.addWire( self.m4n, 'Bottom', 0, (0, -1), (0, 1))
 
-        last_y1_track = roundup( (y_number-1)*c_m2_p, m2_p)
-        last_x1_track = roundup( (x_number-1)*c_m1_p, m1_p)
-
-        grid_y0 = 0
+        '''grid_y0 = 0
         grid_y1 = grid_y0 + last_y1_track
 
         for i in range(x_number-1):
@@ -116,11 +104,11 @@ class CapGenerator(DefaultCanvas):
             self.addWire( self.m2n, net, i, (grid_x0, -1), (grid_x1, 1), netType = netType)
 
         pin = 'MINUS'
-        self.addWire( self.m2, 'MINUS', last_y1_track, (grid_x0, -1), (grid_x1, 1), netType = 'pin')
+        self.addWire( self.m2, 'MINUS', last_y1_track, (grid_x0, -1), (grid_x1, 1), netType = 'pin')'''
 
         self.addRegion( self.boundary, 'Boundary', -2, -2,
-                        last_x1_track+2,
-                        last_y1_track+2)
+                        x_number+2,
+                        y_number+2)
 
         #self.addRegion( self.Cboundary, 'Cboundary', None,
         #                    -1, -1,

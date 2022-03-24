@@ -339,6 +339,22 @@
 },
 
 {
+"Layer": "MIMCap",
+"GdsLayerNo": 89,
+"GdsDatatype": {"Draw":44},
+"Enclosure": 150
+},
+
+{
+"Layer": "MIMCapC",
+"GdsLayerNo": 970,
+"GdsDatatype": {"Draw":0},
+"WidthX": 350,
+"WidthY": 350,
+"Enclosure": 100
+},
+
+{
 "Layer": "Bbox",
 "GdsLayerNo": 100,
 "GdsDatatype": {"Draw":5}
@@ -387,7 +403,8 @@
 "m3Pitch": 72,
 "m1Width": 36,
 "m2Width": 36,
-"m3Width": 36
+"m3Width": 36,
+"m5Width": 450
 }
 
 ]
