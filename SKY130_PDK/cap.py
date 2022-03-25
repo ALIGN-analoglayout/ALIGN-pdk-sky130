@@ -12,7 +12,7 @@ class CapGenerator(DefaultCanvas):
         super().__init__(pdk)
  
         self.m3n = self.addGen( Wire( 'm3n', 'CapMIMLayer', 'v',
-                                     clg=ColoredCenterLineGrid( colors=['c1','c2'], pitch=self.pdk['Cap']['m3Pitch'], width=self.pdk['Cap']['m3Width']),
+                                     clg=UncoloredCenterLineGrid( pitch=self.pdk['M3']['Pitch'], width=self.pdk['M3']['Width']),
                                      spg=EnclosureGrid(pitch=self.pdk['M2']['Pitch'], stoppoint=self.pdk['V2']['VencA_H'] + self.pdk['M2']['Width']//2, check=False)))
         
         self.m5_offset = self.pdk['CapMIMLayer']['Enclosure'] + self.pdk['CapMIMContact']['Enclosure'] + self.pdk['CapMIMContact']['WidthX']//2
@@ -22,10 +22,6 @@ class CapGenerator(DefaultCanvas):
 
         self.Cboundary = self.addGen( Region( 'Cboundary', 'Cboundary', h_grid=self.m2.clg, v_grid=self.m1.clg))
 
-        '''self.v_MIMCapC = self.addGen( Via( 'v_MIMCapC', 'CapMIMContact',
-                                        h_clg=self.m4.clg, v_clg=self.m5n.clg,
-                                        WidthX=self.pdk['CapMIMContact']['WidthX'], WidthY=self.pdk['CapMIMContact']['WidthY'],
-                                        h_ext=self.v4.h_ext, v_ext=self.v4.v_ext))'''
 
         clg_mim = UncoloredCenterLineGrid( pitch=2, width=2)
 
@@ -57,8 +53,6 @@ class CapGenerator(DefaultCanvas):
                                      clg=UncoloredCenterLineGrid( pitch=2*x_length, width=x_length, offset=x_length//2+self.pdk['CapMIMLayer']['Enclosure']),
                                      spg=EnclosureGrid(pitch=y_length, stoppoint=0, check=False))
 
-        '''def compute( l, p):
-            return int( 2*round(  (l+p-w)/(2.0*p) ))'''
 
         x_number = math.ceil(m4n_xwidth/m1_p)
         y_number = math.ceil( m4n_ywidth/m2_p)

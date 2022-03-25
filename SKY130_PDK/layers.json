@@ -347,8 +347,8 @@
 
 {
 "Layer": "CapMIMContact",
-"GdsLayerNo": 970,
-"GdsDatatype": {"Draw":0},
+"GdsLayerNo": 71,
+"GdsDatatype": {"Draw":20},
 "WidthX": 350,
 "WidthY": 350,
 "Enclosure": 100
@@ -398,12 +398,6 @@
 
 {
 "Layer": "Cap",
-"m1Pitch": 72,
-"m2Pitch": 72,
-"m3Pitch": 72,
-"m1Width": 36,
-"m2Width": 36,
-"m3Width": 36,
 "m4Width": 450,
 "m5Width": 450
 }
