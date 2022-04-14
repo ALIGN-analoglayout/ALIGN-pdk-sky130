@@ -162,7 +162,7 @@
 "GdsDatatype": {"Draw":20, "Pin":16, "Label":5, "Blockage":5},
 "Direction": "H",
 "Color": [],
-"Pitch": 1100,
+"Pitch": 1260,
 "Width": 800,
 "MinL": 300,
 "MaxL": null,
@@ -339,6 +339,22 @@
 },
 
 {
+"Layer": "CapMIMLayer",
+"GdsLayerNo": 89,
+"GdsDatatype": {"Draw":44},
+"Enclosure": 150
+},
+
+{
+"Layer": "CapMIMContact",
+"GdsLayerNo": 71,
+"GdsDatatype": {"Draw":20},
+"WidthX": 350,
+"WidthY": 350,
+"Enclosure": 100
+},
+
+{
 "Layer": "Bbox",
 "GdsLayerNo": 100,
 "GdsDatatype": {"Draw":5}
@@ -382,12 +398,8 @@
 
 {
 "Layer": "Cap",
-"m1Pitch": 72,
-"m2Pitch": 72,
-"m3Pitch": 72,
-"m1Width": 36,
-"m2Width": 36,
-"m3Width": 36
+"m4Width": 450,
+"m5Width": 450
 }
 
 ]
