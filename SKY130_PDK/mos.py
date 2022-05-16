@@ -2,6 +2,7 @@ from align.primitive.default.canvas import DefaultCanvas
 from align.cell_fabric.generators import *
 from align.cell_fabric.grid import *
 from math import floor
+import collections
 
 import logging
 logger = logging.getLogger(__name__)
