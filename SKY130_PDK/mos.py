@@ -25,7 +25,7 @@ class MOSGenerator(DefaultCanvas):
         self.gatesPerUnitCell = self.gate + 2*self.gateDummy*(1-self.shared_diff)
         self.finDummy = (self.finsPerUnitCell-fin)//2
         assert self.finDummy >= 8, "number of fins in the transistor must be less than height"
-        assert fin > 1, "number of fins in the transistor must be more than 1" 
+        #assert fin > 1, "number of fins in the transistor must be more than 1" 
         assert gateDummy > 0
         self.unitCellLength = self.gatesPerUnitCell* self.pdk['Poly']['Pitch']
         self.activeOffset = self.unitCellHeight//2 -self.pdk['Fin']['Pitch']//2
@@ -98,6 +98,7 @@ class MOSGenerator(DefaultCanvas):
         v0pitch = self.pdk['V0']['WidthY'] + self.pdk['V0']['SpaceY']
         v0Offset = self.activeOffset - self.activeWidth//2 + self.pdk['V0']['VencA_L'] + self.pdk['V0']['WidthY']//2
         v0_number = floor((self.activeWidth-2*self.pdk['V0']['VencA_L']-self.pdk['V0']['WidthY'])/v0pitch + 1)
+        v0_number = max(v0_number, 1)
         assert v0_number > 0, "V0 can not be placed in the active region"
         v0_number = v0_number if v0_number < 4 else v0_number - 1 ## To avoid voilation of V0 enclosure by M1 DRC
 
@@ -114,7 +115,7 @@ class MOSGenerator(DefaultCanvas):
 
         def _connect_diffusion(i, pin):
             self.addWire( self.m1, None, i, (grid_y0, -1), (grid_y1, 1))
-            for j in range(1,self.v0.h_clg.n-1): ## self.v0.h_clg.n??
+            for j in range(1,self.v0.h_clg.n): ## self.v0.h_clg.n??
                 self.addVia( self.v0, f'{fullname}:{pin}', i, (y, j))
             self._xpins[name][pin].append(i)
             
