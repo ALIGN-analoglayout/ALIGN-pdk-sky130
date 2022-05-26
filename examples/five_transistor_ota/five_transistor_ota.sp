@@ -5,5 +5,4 @@ M3 vout vinn source vss sky130_fd_pr__nfet_01v8 L=150e-9 w=10.5e-7 nf=20 stack=3
 M0 net8 vinp source vss sky130_fd_pr__nfet_01v8 L=150e-9 w=10.5e-7 nf=20 stack=3
 M2 vout net8 vdd vdd sky130_fd_pr__pfet_01v8 L=150e-9 w=10.5e-7 nf=20 stack=3
 M1 net8 net8 vdd vdd sky130_fd_pr__pfet_01v8 L=150e-9 w=10.5e-7 nf=20 stack=3
-C1 vout vss sky130_fd_pr__cap_mim_m3_1 Length=1u Width=1u
 .ends five_transistor_ota

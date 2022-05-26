@@ -59,18 +59,18 @@ class CapGenerator(DefaultCanvas):
 
         logger.debug( f"Number of wires {x_number} {y_number}")
 
-        self.addWire( m4n, 'Bottom', 0, (0, -1), (1, 1))
-        self.addWire( m4n_plate, 'Top', 0, (0, -1), (1, 1))
-        self.addWire( mimcap, 'Bottom', 0, (0, -1), (1, 1))
-        self.addWire( self.m5n, 'Bottom', 0, (-3, 1), (1, 1)) 
-        self.addVia( self.v4_x, 'Bottom', 0, -1)
+        self.addWire( m4n, 'MINUS', 0, (0, -1), (1, 1))
+        self.addWire( m4n_plate, 'PLUS', 0, (0, -1), (1, 1))
+        self.addWire( mimcap, 'MINUS', 0, (0, -1), (1, 1))
+        self.addWire( self.m5n, 'MINUS', 0, (-3, 1), (1, 1)) 
+        self.addVia( self.v4_x, 'MINUS', 0, -1)
         gridx0= (self.m5_offset - self.pdk['CapMIMContact']['WidthX']//2)//2
         gridx1= gridx0 + self.pdk['CapMIMContact']['WidthX']//2
         self.addRegion( self.CapMIMC, None, gridx0, 100, gridx1, 275)
         gridy0 = math.ceil(m4n_ywidth/self.pdk['M4']['Pitch'])
         gridx2 = math.floor(m4n_xwidth/self.pdk['M3']['Pitch'])
-        self.addWire( self.m4, 'Top', gridy0, (-1, -1), (gridx2, 1), netType = 'pin')
-        self.addWire( self.m4, 'Bottom', -1, (-1, -1), (gridx2, 1), netType = 'pin')
+        self.addWire( self.m4, 'PLUS', gridy0, (-1, -1), (gridx2, 1), netType = 'pin')
+        self.addWire( self.m4, 'MINUS', -1, (-1, -1), (gridx2, 1), netType = 'pin')
  
         self.addRegion( self.boundary, 'Boundary', -2, -6,
                         x_number+1,
