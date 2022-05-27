@@ -347,11 +347,11 @@
 
 {
 "Layer": "CapMIMContact",
-"GdsLayerNo": 71,
-"GdsDatatype": {"Draw":20},
-"WidthX": 350,
-"WidthY": 350,
-"Enclosure": 100
+"GdsLayerNo": 70,
+"GdsDatatype": {"Draw":44},
+"WidthX": 200,
+"WidthY": 200,
+"Enclosure": 200
 },
 
 {
