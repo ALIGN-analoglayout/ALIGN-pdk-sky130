@@ -386,6 +386,12 @@
 },
 
 {
+"Layer": "Nwell_fake",
+"GdsLayerNo": 800,
+"GdsDatatype": {"Draw":0}
+},
+
+{
 "Layer": "GuardRing",
 "activeRingWidth": 400,
 "activeRing_enclosure": 300,

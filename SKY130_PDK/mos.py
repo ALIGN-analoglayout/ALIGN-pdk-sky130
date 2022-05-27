@@ -78,9 +78,14 @@ class MOSGenerator(DefaultCanvas):
         self.pselect = self.addGen( Region( 'pselect', 'Pselect',
                                             v_grid=CenteredGrid( offset= self.pdk['Poly']['Pitch']//2, pitch= self.pdk['Poly']['Pitch']),
                                             h_grid=self.fin.clg))
+
         self.nwell = self.addGen( Region( 'nwell', 'Nwell',
                                             v_grid=CenteredGrid( offset= self.pdk['Poly']['Pitch']//2, pitch= self.pdk['Poly']['Pitch']),
-                                            h_grid=self.fin.clg))         
+                                            h_grid=self.fin.clg)) 
+
+        self.nwell_fake = self.addGen( Region( 'nwell_fake', 'Nwell_fake',
+                                            v_grid=CenteredGrid( offset= self.pdk['Poly']['Pitch']//2, pitch= self.pdk['Poly']['Pitch']),
+                                            h_grid=self.fin.clg))
 
         self.va = self.addGen( Via( 'va', 'V0',
                                     h_clg=self.m2.clg,
@@ -297,6 +302,8 @@ class MOSGenerator(DefaultCanvas):
         self.addRegion( self.nselect, None, (1, -1), 0, (x_cells*self.gatesPerUnitCell+2*self.gateDummy*self.shared_diff-1, -1), y_cells* self.finsPerUnitCell)
         if self.bodyswitch==1:self.addRegion( self.pselect, None, (1, -1), y_cells* self.finsPerUnitCell, (x_cells*self.gatesPerUnitCell+2*self.gateDummy*self.shared_diff-1, -1), y_cells* self.finsPerUnitCell+self.bodyswitch*self.pdk['Active']['Body_nfin'])
 
+        self.addRegion( self.nwell_fake, None, (-1, -1), -4, (x_cells*self.gatesPerUnitCell+2*self.gateDummy*self.shared_diff+1, -1), y_cells* self.finsPerUnitCell+self.bodyswitch*self.pdk['Active']['Body_nfin']+4)
+
     def addPMOSArray( self, x_cells, y_cells, pattern, vt_type, connections, **parameters):
 
         self._addMOSArray(x_cells, y_cells, pattern, vt_type, connections, **parameters)
@@ -305,4 +312,6 @@ class MOSGenerator(DefaultCanvas):
         self.addRegion( self.pselect, None, (1, -1), 0, (x_cells*self.gatesPerUnitCell+2*self.gateDummy*self.shared_diff-1, -1), y_cells* self.finsPerUnitCell)
         self.addRegion( self.nwell, None, (1, -1), 0, (x_cells*self.gatesPerUnitCell+2*self.gateDummy*self.shared_diff-1, -1), y_cells* self.finsPerUnitCell+self.bodyswitch*self.pdk['Active']['Body_nfin'])
         if self.bodyswitch==1:self.addRegion( self.nselect, None, (1, -1), y_cells* self.finsPerUnitCell, (x_cells*self.gatesPerUnitCell+2*self.gateDummy*self.shared_diff-1, -1), y_cells* self.finsPerUnitCell+self.bodyswitch*self.pdk['Active']['Body_nfin'])
+
+        self.addRegion( self.nwell_fake, None, (-1, -1), -4, (x_cells*self.gatesPerUnitCell+2*self.gateDummy*self.shared_diff+1, -1), y_cells* self.finsPerUnitCell+self.bodyswitch*self.pdk['Active']['Body_nfin']+4)
 
