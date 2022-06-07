@@ -14,11 +14,17 @@ class CapGenerator(DefaultCanvas):
         self.m3n = self.addGen( Wire( 'm3n', 'CapMIMLayer', 'v',
                                      clg=UncoloredCenterLineGrid( pitch=self.pdk['M3']['Pitch'], width=self.pdk['M3']['Width']),
                                      spg=EnclosureGrid(pitch=self.pdk['M2']['Pitch'], stoppoint=self.pdk['V2']['VencA_H'] + self.pdk['M2']['Width']//2, check=False)))
+ 
         
         self.m5_offset = self.pdk['CapMIMLayer']['Enclosure'] + self.pdk['CapMIMContact']['Enclosure'] + self.pdk['CapMIMContact']['WidthX']//2
         self.m5n = self.addGen(Wire( 'm5n', 'M5', 'v',
                                      clg=UncoloredCenterLineGrid( pitch=2*self.pdk['Cap']['m5Width'], width=self.pdk['Cap']['m5Width'], offset=self.m5_offset),
                                      spg=EnclosureGrid(pitch=self.pdk['M4']['Pitch']//2, stoppoint=self.pdk['CapMIMContact']['Enclosure'], offset=0, check=False)))
+
+        self.m3n_v = self.addGen( Wire( 'm3n_v', 'M3', 'v',
+                                     clg=UncoloredCenterLineGrid( pitch=2*self.pdk['Cap']['m5Width'], width=self.pdk['M3']['Width'], offset=self.m5_offset),
+                                     spg=EnclosureGrid(pitch=self.pdk['M4']['Pitch'], stoppoint=self.pdk['V3']['VencA_H'] + self.pdk['M4']['Width']//2, check=False)))
+
 
         self.Cboundary = self.addGen( Region( 'Cboundary', 'Cboundary', h_grid=self.m2.clg, v_grid=self.m1.clg))
 
@@ -30,6 +36,16 @@ class CapGenerator(DefaultCanvas):
         self.v4_x = self.addGen( Via( 'v4_x', 'V4',
                                         h_clg=self.m4.clg, v_clg=self.m5n.clg,
                                         WidthX=self.v4.WidthX, WidthY=self.v4.WidthY,
+                                        h_ext=self.v4.h_ext, v_ext=self.v4.v_ext))
+
+        self.v3_x = self.addGen( Via( 'v3_x', 'V3',
+                                        h_clg=self.m4.clg, v_clg=self.m5n.clg,
+                                        WidthX=self.v3.WidthX, WidthY=self.v3.WidthY,
+                                        h_ext=self.v3.h_ext, v_ext=self.v3.v_ext))
+
+        self.v2_x = self.addGen( Via( 'v2_x', 'V2',
+                                        h_clg=self.m4.clg, v_clg=self.m5n.clg,
+                                        WidthX=self.v2.WidthX, WidthY=self.v2.WidthY,
                                         h_ext=self.v4.h_ext, v_ext=self.v4.v_ext))
 
     def addCap( self, length, width):
@@ -47,8 +63,9 @@ class CapGenerator(DefaultCanvas):
                                      spg=EnclosureGrid(pitch=y_length, stoppoint=self.pdk['CapMIMLayer']['Enclosure'], check=False))
 
         m4n_plate = Wire( 'm4n_plate', 'M4', 'v',
-                                     clg=UncoloredCenterLineGrid( pitch=m4n_xwidth-self.pdk['Cap']['m4Width']//2, width=self.pdk['Cap']['m4Width'], offset=0),
+                                     clg=UncoloredCenterLineGrid( pitch=2*m4n_xwidth, width=m4n_xwidth, offset=m4n_xwidth//2),
                                      spg=EnclosureGrid(pitch=self.pdk['M4']['Pitch'], stoppoint=0, offset=-self.pdk['M4']['Width']//4, check=False))
+
         mimcap = Wire( 'mim', 'CapMIMLayer', 'v',
                                      clg=UncoloredCenterLineGrid( pitch=2*x_length, width=x_length, offset=x_length//2+self.pdk['CapMIMLayer']['Enclosure']),
                                      spg=EnclosureGrid(pitch=y_length, stoppoint=0, check=False))
@@ -61,19 +78,27 @@ class CapGenerator(DefaultCanvas):
         logger.debug( f"Number of wires {x_number} {y_number}")
 
         self.addWire( m4n, 'MINUS', 0, (0, -1), (1, 1))
-        self.addWire( m4n_plate, 'PLUS', 1, (y_number_m4-1-1, -1), (y_number_m4, 1))
+        self.addWire( m4n_plate, 'PLUS', 0, (y_number_m4-2, -1), (y_number_m4, 1))
         self.addWire( mimcap, 'MINUS', 0, (0, -1), (1, 1))
-        self.addWire( self.m5n, 'MINUS', 0, (-3, 1), (1, 1)) 
-        self.addVia( self.v4_x, 'MINUS', 0, -1)
+        self.addWire( self.m5n, 'MINUS', 0, (-5, 1), (1, 1)) 
+        self.addVia( self.v4_x, 'MINUS', 0, -2)
+        self.addVia( self.v3_x, 'MINUS', 0, -2)
+        self.addVia( self.v2_x, 'MINUS', 0, -2)
+        self.addVia( self.v3_x, 'PLUS', 0, y_number_m4)
+        self.addVia( self.v2_x, 'PLUS', 0, y_number_m4)
         gridx0= (self.m5_offset - self.pdk['CapMIMContact']['WidthX']//2)//2
         gridx1= gridx0 + self.pdk['CapMIMContact']['WidthX']//2
         self.addRegion( self.CapMIMC, None, gridx0, 150, gridx1, 250)
-        gridx2 = math.floor(m4n_xwidth/self.pdk['M3']['Pitch'])
-        self.addWire( self.m4, 'PLUS', y_number_m4, (-1, -1), (gridx2, 1), netType = 'pin')
-        self.addWire( self.m4, 'MINUS', -1, (-1, -1), (gridx2, 1), netType = 'pin')
+        gridx2 = math.floor(m4n_xwidth/self.pdk['M1']['Pitch'])
+        self.addWire( self.m2, 'PLUS', 3*y_number_m4, (-1, -1), (gridx2, 1), netType = 'pin')
+        self.addWire( self.m4, 'PLUS', y_number_m4, (0, -1), (2, 1))
+        self.addWire( self.m4, 'MINUS', -2, (0, -1), (2, 1))
+        self.addWire( self.m3n_v, 'MINUS', 0, (-2, -1), (-2, 1))
+        self.addWire( self.m3n_v, 'PLUS', 0, (y_number_m4, -1), (y_number_m4, 1))
+        self.addWire( self.m2, 'MINUS', -6, (-1, -1), (gridx2, 1), netType = 'pin')
  
-        self.addRegion( self.boundary, 'Boundary', -2, -6,
-                        x_number+1,
+        self.addRegion( self.boundary, 'Boundary', -4, -9,
+                        x_number+3,
                         y_number+3)
 
         #self.addRegion( self.Cboundary, 'Cboundary', None,
