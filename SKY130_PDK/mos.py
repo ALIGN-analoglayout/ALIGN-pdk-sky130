@@ -72,7 +72,7 @@ class MOSGenerator(DefaultCanvas):
         stoppoint = self.pdk['Active']['activePolyExTracks']*self.pdk['M2']['Pitch']
         self.pl = self.addGen( Wire( 'pl', 'Poly', 'v',
                                      clg=UncoloredCenterLineGrid( pitch= self.pdk['Poly']['Pitch'], width= self.pdk['Poly']['Width'], offset= self.pdk['Poly']['Offset']),
-                                     spg=EnclosureGrid( pitch=unitCellHeight, offset=self.pdk['M2']['Offset'], stoppoint=stoppoint, check=True)))
+                                     spg=EnclosureGrid( pitch=self.unitCellHeight, offset=self.pdk['M2']['Offset'], stoppoint=stoppoint, check=True)))
 
         self.m1_updated = self.addGen( Wire( 'm1_updated ', 'M1', 'v',
                                      clg=UncoloredCenterLineGrid( pitch=self.pdk['M1']['Pitch'], width=self.pdk['M1']['Width']),
@@ -80,7 +80,7 @@ class MOSGenerator(DefaultCanvas):
 
         self.m2_updated = self.addGen( Wire( 'm2_updated ', 'M2', 'h',
                                      clg=UncoloredCenterLineGrid( pitch=self.pdk['M2']['Pitch'], width=self.pdk['M2']['Width']),
-                                     spg=EnclosureGrid( pitch=self.pdk['M1']['Pitch'], stoppoint=self.pdk['V1']['VencA_L']+self.pdk['M1']['Width']//2, check=False)))
+                                     spg=EnclosureGrid( pitch=self.pdk['M1']['Pitch'], stoppoint=self.pdk['V0']['VencA_L']//2+self.pdk['M1']['Width']//2, check=False)))
 
         self.fin = self.addGen( Wire( 'fin', 'Fin', 'h',
                                       clg=UncoloredCenterLineGrid( pitch= self.pdk['Fin']['Pitch'], width= self.pdk['Fin']['Width'], offset= self.pdk['Fin']['Offset']),
@@ -88,7 +88,7 @@ class MOSGenerator(DefaultCanvas):
  
 
         offset = self.gateDummy*self.pdk['Poly']['Pitch']+self.pdk['Poly']['Offset'] - self.pdk['Poly']['Pitch']//2
-        stoppoint = self.gateDummy*self.pdk['Poly']['Pitch'] + self.pdk['Poly']['Offset']-self.pdk['Active']['poly_enclosure']
+        stoppoint = self.gateDummy*self.pdk['Poly']['Pitch'] + self.pdk['Poly']['Offset']-self.pdk['Active']['poly_enclosure']-length_diff//2-dynamic_space//2
         self.active = self.addGen( Wire( 'active', 'Active', 'h',
                                          clg=UncoloredCenterLineGrid( pitch=activePitch, width=activeWidth, offset=activeOffset),
                                          spg=EnclosureGrid( pitch=unitCellLength, offset=offset*self.shared_diff, stoppoint=stoppoint-offset*self.shared_diff, check=True)))
@@ -160,7 +160,7 @@ class MOSGenerator(DefaultCanvas):
         self.subinsts[fullname].parameters.update(parameters)
 
         def _connect_diffusion(i, pin):
-            self.addWire( self.m1_updated, None, i, (grid_y0, -1), (grid_y1, 1))
+            self.addWire( self.m1_updated, None, i, (grid_y0, -1), (grid_y1-1, 1))
             for j in range(1,self.v0.h_clg.n): ## self.v0.h_clg.n??
                 self.addVia( self.v0, f'{fullname}:{pin}', i, (y, j))
             self._xpins[name][pin].append(i)
@@ -270,7 +270,7 @@ class MOSGenerator(DefaultCanvas):
                 if len(contacts) == 1: # Create m2 terminal
                     i = next(iter(contacts))
                     minx, maxx = _get_wire_terminators(conn[i])
-                    self.addWire(self.m2_updated, net, i, (minx, -1), (maxx, 1), netType = 'pin')
+                    self.addWire(self.m2, net, i, (minx, -1), (maxx, 1), netType = 'pin')
                 else: # create m3 terminal(s)
                     self.addWireAndViaSet(net, self.m3, self.v2, current_track, contacts, netType = 'pin')
                     if max(contacts) - min(contacts) < 2:
@@ -284,7 +284,7 @@ class MOSGenerator(DefaultCanvas):
                     for i, locs in conn.items():
                         minx, maxx = _get_wire_terminators([*locs, current_track])
                         if self.pdk['M3']['Pitch'] >= self.pdk['M1']['Pitch']:
-                            self.addWire(self.m2, net, i, (minx, -1), (maxx, 1))
+                            self.addWire(self.m2_updated, net, i, (minx, -1), (maxx, 1))
                         else:
                             self.addWire( self.m2_updated, net, i, (0, 1), (M1_tracks, -1))
 
