@@ -82,7 +82,9 @@ def gen_param(subckt, primitives, pdk_dir):
         else:
             # HACK for unit cap used in common centroid and support older SPICE
             length = int((sqrt(size/2))*1000)
+            if length % 2 > 0 : length += 1
             width = int((sqrt(size/2))*1000)
+            if width % 2 > 0 : width += 1
 
         # TODO: use float in name
         logger.debug(f"Generating capacitor for:{block_name}, {size}")
