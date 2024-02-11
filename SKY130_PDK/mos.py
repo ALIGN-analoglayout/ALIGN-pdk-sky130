@@ -93,6 +93,13 @@ class MOSGenerator(DefaultCanvas):
                                     v_clg=self.m1.clg,
                                     WidthX=self.pdk['V0']['WidthX'],
                                     WidthY=self.pdk['V0']['WidthY']))
+        self.LVT = self.addGen( Wire( 'LVT', 'Lvt', 'h',
+                                      clg=UncoloredCenterLineGrid( pitch=self.activePitch, width=self.RVTWidth, offset=self.activeOffset),
+                                      spg=EnclosureGrid( pitch=self.unitCellLength, offset=0, stoppoint=stoppoint, check=True)))
+
+        self.HVT = self.addGen( Wire( 'HVT', 'Hvt', 'h',
+                                      clg=UncoloredCenterLineGrid( pitch=self.activePitch, width=self.RVTWidth, offset=self.activeOffset),
+                                      spg=EnclosureGrid( pitch=self.unitCellLength, offset=0, stoppoint=stoppoint, check=True)))
 
         self.v0.h_clg.addCenterLine( 0,                 self.pdk['V0']['WidthY'], False)
         v0pitch = self.pdk['V0']['WidthY'] + self.pdk['V0']['SpaceY']
