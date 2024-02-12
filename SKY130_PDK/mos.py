@@ -115,13 +115,12 @@ class MOSGenerator(DefaultCanvas):
         v0_number = floor((self.activeWidth-2*self.pdk['V0']['VencA_L']-self.pdk['V0']['WidthY'])/v0pitch + 1)
         v0_number = max(v0_number, 1)
         assert v0_number > 0, "V0 can not be placed in the active region"
-        v0_number = v0_number if v0_number < 4 else v0_number - 1 ## To avoid voilation of V0 enclosure by M1 DRC
+        v0_number = v0_number #if v0_number < 4 else v0_number - 1 ## To avoid voilation of V0 enclosure by M1 DRC
 
         for i in range(v0_number):
             self.v0.h_clg.addCenterLine(i*v0pitch+v0Offset,    self.pdk['V0']['WidthY'], True)
 
         self.v0.h_clg.addCenterLine( self.unitCellHeight,    self.pdk['V0']['WidthY'], False)
-        info = self.pdk['V0']
 
     def _addMOS( self, x, y, x_cells,  vt_type, name='M1', reflect=False, **parameters):
 
