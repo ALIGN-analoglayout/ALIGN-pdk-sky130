@@ -12,24 +12,24 @@ class ResGenerator(DefaultCanvas):
         self.finsPerUnitCell = fin + 2*finDummy
         # TODO: Generalize these
         self.m1res = self.addGen( Wire( 'm1res', 'M1', 'v',
-                                     clg=ColoredCenterLineGrid( colors=['c1','c2'], pitch=self.pdk['Cap']['m1Pitch'], width=self.pdk['Cap']['m1Width']),
-                                     spg=EnclosureGrid( pitch=self.pdk['M2']['Pitch'], stoppoint=self.pdk['V1']['VencA_L'] +self.pdk['Cap']['m2Width']//2, check=True)))
+                                     clg=ColoredCenterLineGrid( colors=['c1','c2'], pitch=self.pdk['M1']['Pitch'], width=self.pdk['M1']['Width']),
+                                     spg=EnclosureGrid( pitch=self.pdk['M2']['Pitch'], stoppoint=self.pdk['V1']['VencA_L'] +self.pdk['M2']['Width']//2, check=True)))
 
         self.m1res2 = self.addGen( Wire( 'm1res2', 'M1', 'h',
-                                     clg=ColoredCenterLineGrid( colors=['c1','c2'], pitch=self.pdk['M2']['Pitch'], width=self.pdk['Cap']['m1Width']),
-                                     spg=EnclosureGrid( pitch=self.pdk['Cap']['m1Pitch'], stoppoint=self.pdk['Cap']['m1Width']//2, check=False)))
+                                     clg=ColoredCenterLineGrid( colors=['c1','c2'], pitch=self.pdk['M2']['Pitch'], width=self.pdk['M1']['Width']),
+                                     spg=EnclosureGrid( pitch=self.pdk['M1']['Pitch'], stoppoint=self.pdk['M1']['Width']//2, check=False)))
 
         self.m2res = self.addGen( Wire( 'm2res', 'M2', 'h',
-                                     clg=ColoredCenterLineGrid( colors=['c1','c2'], pitch=self.pdk['M2']['Pitch'], width=self.pdk['Cap']['m2Width']),
-                                     spg=EnclosureGrid( pitch=self.pdk['Cap']['m1Pitch'], stoppoint=self.pdk['V1']['VencA_H'] + self.pdk['Cap']['m1Width']//2, check=False)))
+                                     clg=ColoredCenterLineGrid( colors=['c1','c2'], pitch=self.pdk['M2']['Pitch'], width=self.pdk['M2']['Width']),
+                                     spg=EnclosureGrid( pitch=self.pdk['M1']['Pitch'], stoppoint=self.pdk['V1']['VencA_H'] + self.pdk['M1']['Width']//2, check=False)))
 
         self.m2res2 = self.addGen( Wire( 'm2res2', 'M2', 'h',
-                                      clg=ColoredCenterLineGrid( colors=['c1','c2'], pitch=self.pdk['Cap']['m2Pitch'], width=self.pdk['Cap']['m2Width']),
-                                      spg=EnclosureGrid( pitch=self.pdk['Cap']['m1Pitch'], stoppoint=self.pdk['V1']['VencA_H'] + self.pdk['Cap']['m1Width']//2)))
+                                      clg=ColoredCenterLineGrid( colors=['c1','c2'], pitch=self.pdk['M2']['Pitch'], width=self.pdk['M2']['Width']),
+                                      spg=EnclosureGrid( pitch=self.pdk['M1']['Pitch'], stoppoint=self.pdk['V1']['VencA_H'] + self.pdk['M1']['Width']//2)))
 
         self.m3res = self.addGen( Wire( 'm3res', 'M3', 'v',
-                                     clg=ColoredCenterLineGrid( colors=['c1','c2'], pitch=self.pdk['Cap']['m3Pitch'], width=self.pdk['Cap']['m3Width']),
-                                     spg=EnclosureGrid(pitch=self.pdk['M2']['Pitch'], stoppoint=self.pdk['V2']['VencA_H'] + self.pdk['Cap']['m2Width']//2, check=True)))
+                                     clg=ColoredCenterLineGrid( colors=['c1','c2'], pitch=self.pdk['M3']['Pitch'], width=self.pdk['M3']['Width']),
+                                     spg=EnclosureGrid(pitch=self.pdk['M2']['Pitch'], stoppoint=self.pdk['V2']['VencA_H'] + self.pdk['M2']['Width']//2, check=True)))
 
         self.v1res = self.addGen( Via( 'v1res', 'V1',
                                         h_clg=self.m2res.clg, v_clg=self.m1res.clg,
@@ -58,9 +58,9 @@ class ResGenerator(DefaultCanvas):
         # ga = 2 if x_number == 1 else 1 ## when number of wires is 2 then large spacing req. so contact can be placed without a DRC error 
         # x_length = (x_number - 1) *ga*self.pdk['Cap']['m1Pitch']
 
-        y_number = int(2 *round(((y_length+self.pdk['Cap']['m2Pitch']-self.pdk['Cap']['m2Width'])/(2.0*self.pdk['Cap']['m2Pitch']))))
+        y_number = int(2 *round(((y_length+self.pdk['M2']['Pitch']-self.pdk['M2']['Width'])/(2.0*self.pdk['M2']['Pitch']))))
 
-        last_y1_track = ((y_number-1)*self.pdk['Cap']['m2Pitch']+self.pdk['M2']['Pitch']-1)//self.pdk['M2']['Pitch']
+        last_y1_track = ((y_number-1)*self.pdk['M2']['Pitch']+self.pdk['M2']['Pitch']-1)//self.pdk['M2']['Pitch']
         last_x_track = x_number - 1
 
         m2factor = 2 ### number of m2-tracks (m2factor-1)in between two unitcells in y-direction
