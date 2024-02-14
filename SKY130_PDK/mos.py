@@ -105,9 +105,17 @@ class MOSGenerator(DefaultCanvas):
                                       clg=UncoloredCenterLineGrid( pitch=self.activePitch, width=self.RVTWidth, offset=self.activeOffset),
                                       spg=EnclosureGrid( pitch=self.unitCellLength, offset=0, stoppoint=stoppoint, check=True)))
 
+        self.LVT_diff = self.addGen( Wire( 'LVT_diff', 'Lvt', 'h',
+                                         clg=UncoloredCenterLineGrid( pitch=self.activePitch, width=self.RVTWidth, offset=self.activeOffset),
+                                         spg=SingleGrid( pitch=self.pdk['Poly']['Pitch'], offset=(self.gateDummy-1)*self.pdk['Poly']['Pitch']+self.pdk['Poly']['Pitch']//2)))
+
         self.HVT = self.addGen( Wire( 'HVT', 'Hvt', 'h',
                                       clg=UncoloredCenterLineGrid( pitch=self.activePitch, width=self.RVTWidth, offset=self.activeOffset),
                                       spg=EnclosureGrid( pitch=self.unitCellLength, offset=0, stoppoint=stoppoint, check=True)))
+
+        self.HVT_diff = self.addGen( Wire( 'HVT_diff', 'Hvt', 'h',
+                                         clg=UncoloredCenterLineGrid( pitch=self.activePitch, width=self.RVTWidth, offset=self.activeOffset),
+                                         spg=SingleGrid( pitch=self.pdk['Poly']['Pitch'], offset=(self.gateDummy-1)*self.pdk['Poly']['Pitch']+self.pdk['Poly']['Pitch']//2)))
 
         self.v0.h_clg.addCenterLine( 0,                 self.pdk['V0']['WidthY'], False)
         v0pitch = self.pdk['V0']['WidthY'] + self.pdk['V0']['SpaceY']
@@ -142,10 +150,20 @@ class MOSGenerator(DefaultCanvas):
             pass
     
         def _addLVT(x, y, x_cells):
-            self.addWire( self.LVT,  None, y,          (x, 1), (x+1, -1))    
+            if self.shared_diff == 0:
+                self.addWire( self.LVT,  None, y,          (x, 1), (x+1, -1))
+            elif self.shared_diff == 1 and x == x_cells-1:
+                self.addWire( self.LVT_diff,  None, y, 0, self.gate*x_cells+1)
+            else:
+                pass
 
         def _addHVT(x, y, x_cells):
-            self.addWire( self.HVT,  None, y,          (x, 1), (x+1, -1))  
+            if self.shared_diff == 0:
+                self.addWire( self.HVT,  None, y,          (x, 1), (x+1, -1))
+            elif self.shared_diff == 1 and x == x_cells-1:
+                self.addWire( self.HVT_diff,  None, y, 0, self.gate*x_cells+1)
+            else:
+                pass
      
         if vt_type == 'RVT':
             _addRVT(x, y, x_cells)
