@@ -1,0 +1,18 @@
+[
+    {
+        "constraint": "HorizontalDistance",
+        "abs_distance": 0
+    },
+    {
+        "constraint": "VerticalDistance",
+        "abs_distance": 0
+    },
+    {
+        "constraint": "GroupBlocks",
+        "instances": [
+            "M1",
+            "M2"
+        ],
+        "instance_name": "dp"
+    }
+]
