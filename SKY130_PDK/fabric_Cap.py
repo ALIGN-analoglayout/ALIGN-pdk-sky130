@@ -6,7 +6,6 @@ from align.schema.parser import SpiceParser
 from align.compiler.util import get_primitive_spice
 
 
-
 def gen_parser():
     parser = argparse.ArgumentParser(description="Inputs for Cell Generation")
     parser.add_argument("-i", "--input_spice", type=str, required=False, default=None)
@@ -44,9 +43,8 @@ def read_primitive_spice(args):
 
 def main(args):
     cap_subckt = read_primitive_spice(args)
-    return generate_primitive(args.block_name, cap_subckt, value=(args.cap_length, args.cap_width), pdkdir=args.pdkdir, outputdir=args.outputdir)
+    return generate_primitive(args.block_name, cap_subckt, value=(args.cap_length, args.cap_width), pdkdir = args.pdkdir, outputdir = args.outputdir)
 
 
 if __name__ == "__main__":
     main(gen_parser().parse_args())
-
