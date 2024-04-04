@@ -67,7 +67,8 @@ class MOSGenerator(DefaultCanvas):
         activeWidth =  exact_width if exact_width else self.pdk['Fin']['Pitch']*fin
         activePitch = self.unitCellHeight
         RVTWidth = activeWidth + 2*self.pdk['Active']['active_enclosure']
-
+        LVTWidth = activeWidth + 2*self.pdk['Lvt']['active_enclosure']
+        HVTWidth = activeWidth + 2*self.pdk['Hvt']['active_enclosure']
  
         stoppoint = self.pdk['Active']['activePolyExTracks']*self.pdk['M2']['Pitch']
         self.pl = self.addGen( Wire( 'pl', 'Poly', 'v',
@@ -91,6 +92,15 @@ class MOSGenerator(DefaultCanvas):
         stoppoint = self.gateDummy*self.pdk['Poly']['Pitch'] + self.pdk['Poly']['Offset']-self.pdk['Active']['poly_enclosure']-length_diff//2-dynamic_space//2
         self.active = self.addGen( Wire( 'active', 'Active', 'h',
                                          clg=UncoloredCenterLineGrid( pitch=activePitch, width=activeWidth, offset=activeOffset),
+                                         spg=EnclosureGrid( pitch=unitCellLength, offset=offset*self.shared_diff, stoppoint=stoppoint-offset*self.shared_diff, check=True)))
+
+
+        self.LVT = self.addGen( Wire( 'LVT', 'Lvt', 'h',
+                                         clg=UncoloredCenterLineGrid( pitch=activePitch, width=LVTWidth, offset=activeOffset),
+                                         spg=EnclosureGrid( pitch=unitCellLength, offset=offset*self.shared_diff, stoppoint=stoppoint-offset*self.shared_diff, check=True)))
+
+        self.HVT = self.addGen( Wire( 'HVT', 'Hvt', 'h',
+                                         clg=UncoloredCenterLineGrid( pitch=activePitch, width=HVTWidth, offset=activeOffset),
                                          spg=EnclosureGrid( pitch=unitCellLength, offset=offset*self.shared_diff, stoppoint=stoppoint-offset*self.shared_diff, check=True)))
 
         

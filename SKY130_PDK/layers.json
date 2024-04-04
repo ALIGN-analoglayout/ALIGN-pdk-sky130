@@ -298,7 +298,7 @@
 "Layer": "Lvt",
 "GdsLayerNo": 125,
 "GdsDatatype": {"Draw":44},
-"poly_enclosure": 325
+"active_enclosure": 180
 },
 
 {
@@ -335,7 +335,7 @@
 "Layer": "Hvt",
 "GdsLayerNo": 970,
 "GdsDatatype": {"Draw":0},
-"poly_enclosure": 325
+"active_enclosure": 180
 },
 
 {
