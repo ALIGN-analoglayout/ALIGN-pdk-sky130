@@ -55,7 +55,7 @@ class MOSGenerator(DefaultCanvas):
         self.shared_diff = shared_diff
         self.stack = stack
         self.bodyswitch = bodyswitch
-        self.gateDummy = gateDummy
+        self.gateDummy = max(1, self.pdk['Active']['Dummy_gates'])
         self.gate = (2*gate)*self.stack
         self.gatesPerUnitCell = self.gate + 2*self.gateDummy*(1-self.shared_diff)
         self.finDummy = (self.finsPerUnitCell-fin)//2

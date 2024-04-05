@@ -279,7 +279,8 @@
 "plActive_s": 71,
 "poly_enclosure": 340,
 "activePolyExTracks": 3,
-"Body_nfin": 8
+"Body_nfin": 8,
+"Dummy_gates": 1
 },
 
 {
@@ -339,8 +340,8 @@
 
 {
 "Layer": "Hvt",
-"GdsLayerNo": 970,
-"GdsDatatype": {"Draw":0},
+"GdsLayerNo": 78,
+"GdsDatatype": {"Draw":44},
 "active_enclosure": 180
 },
 
