@@ -302,6 +302,12 @@
 },
 
 {
+"Layer": "LvtId",
+"GdsLayerNo": 81,
+"GdsDatatype": {"Draw":108}
+},
+
+{
 "Layer": "Npc",
 "GdsLayerNo": 95,
 "GdsDatatype": {"Draw":20},

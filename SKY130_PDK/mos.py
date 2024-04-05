@@ -99,6 +99,11 @@ class MOSGenerator(DefaultCanvas):
                                          clg=UncoloredCenterLineGrid( pitch=activePitch, width=LVTWidth, offset=activeOffset),
                                          spg=EnclosureGrid( pitch=unitCellLength, offset=offset*self.shared_diff, stoppoint=stoppoint-offset*self.shared_diff, check=True)))
 
+
+        self.LVTID = self.addGen( Wire( 'LVTID', 'LvtId', 'h',
+                                         clg=UncoloredCenterLineGrid( pitch=activePitch, width=LVTWidth, offset=activeOffset),
+                                         spg=EnclosureGrid( pitch=unitCellLength, offset=offset*self.shared_diff, stoppoint=stoppoint-offset*self.shared_diff, check=True)))
+
         self.HVT = self.addGen( Wire( 'HVT', 'Hvt', 'h',
                                          clg=UncoloredCenterLineGrid( pitch=activePitch, width=HVTWidth, offset=activeOffset),
                                          spg=EnclosureGrid( pitch=unitCellLength, offset=offset*self.shared_diff, stoppoint=stoppoint-offset*self.shared_diff, check=True)))
@@ -184,7 +189,8 @@ class MOSGenerator(DefaultCanvas):
             pass
     
         def _addLVT(x, y, x_cells):
-            self.addWire( self.LVT,  None, y,          (x, 1), (x+1, -1))    
+            self.addWire( self.LVT,  None, y,          (x, 1), (x+1, -1))
+            self.addWire( self.LVTID,  None, y,          (x, 1), (x+1, -1))
 
         def _addHVT(x, y, x_cells):
             self.addWire( self.HVT,  None, y,          (x, 1), (x+1, -1))  
