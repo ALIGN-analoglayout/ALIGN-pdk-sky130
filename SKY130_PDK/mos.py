@@ -280,6 +280,18 @@ class MOSGenerator(DefaultCanvas):
         else:
             self.minvias = minvias
         names = ['M1'] if pattern == 0 else ['M1', 'M2']
+        # FIX(option1): ratio current-mirror split. Device 'M1' (names[0]) gets exactly
+        # ratio_a_cells of the total cells; rest -> 'M2'. Spread evenly (Bresenham) over a
+        # global cell index so it honors the f0:f1 ratio for ANY x_cells/y_cells aspect.
+        ratio_a_cells = parameters.pop('ratio_a_cells', None)
+        _total_cells = x_cells * y_cells
+        if ratio_a_cells is not None:
+            _cell_is_A = []
+            _acc = 0
+            for _i in range(_total_cells):
+                _want = ((_i + 1) * ratio_a_cells) // _total_cells
+                _cell_is_A.append(_want > _acc)
+                _acc = _want
         self._nets = collections.defaultdict(lambda: collections.defaultdict(list)) # net:m2track:m1contacts (Updated by self._connectDevicePins)
         for y in range(y_cells):
             self._xpins = collections.defaultdict(lambda: collections.defaultdict(list)) # inst:pin:m1tracks (Updated by self._addMOS)
@@ -304,12 +316,14 @@ class MOSGenerator(DefaultCanvas):
                     # A B A B A B
                     self._addMOS(x, y, x_cells, vt_type, names[((x % 2) + (y % 2)) % 2], False,  **parameters)   
                     if self.bodyswitch==1:self._addBodyContact(x, y, x_cells, y_cells - 1, names[((x % 2) + (y % 2)) % 2])
-                elif pattern == 3: # CurrentMirror
-                    # TODO: Evaluate if this needs to change. Currently:
-                    # B B B A A B B B
-                    # B B B A A B B B
-                    self._addMOS(x, y, x_cells, vt_type, names[0 if 0 <= ((x_cells // 2) - x) <= 1 else 1], False,  **parameters)
-                    if self.bodyswitch==1:self._addBodyContact(x, y, x_cells, y_cells - 1, names[0 if 0 <= ((x_cells // 2) - x) <= 1 else 1])
+                elif pattern == 3: # CurrentMirror (ratio)
+                    # FIX(option1): proportional split honoring f0:f1, evenly spread.
+                    if ratio_a_cells is not None:
+                        _sel = 0 if _cell_is_A[y * x_cells + x] else 1
+                    else:
+                        _sel = 0 if 0 <= ((x_cells // 2) - x) <= 1 else 1
+                    self._addMOS(x, y, x_cells, vt_type, names[_sel], False,  **parameters)
+                    if self.bodyswitch==1:self._addBodyContact(x, y, x_cells, y_cells - 1, names[_sel])
                 else:
                     assert False, "Unknown pattern"
             self._connectDevicePins(y, y_cells, connections)

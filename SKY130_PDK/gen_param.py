@@ -164,6 +164,12 @@ def gen_param(subckt, primitives, pdk_dir):
         if 'SCM' in block_name:
             if int(mvalues[device_name_all[0]]["NFIN"])*int(mvalues[device_name_all[0]]["NF"])*int(mvalues[device_name_all[0]]["M"]) != \
                     int(mvalues[device_name_all[1]]["NFIN"])*int(mvalues[device_name_all[1]]["NF"])*int(mvalues[device_name_all[1]]["M"]):
+                # FIX(option1): ratio mirror — tile to EXACTLY (f0+f1) fingers, no ceil
+                # over-provision. With main.py skipping the *2 doubling for ratio SCM and 2
+                # fingers/cell, no_units = total_fingers/2 yields exactly total_fingers. (NF is
+                # asserted even upstream, so size is even.) Replaces ceil(size/(2*len)) which
+                # over-sized any mirror whose finger sum isn't a multiple of 4.
+                no_units = size // 2
                 square_y = 1
                 yval = square_y
                 xval = int(no_units / square_y)
