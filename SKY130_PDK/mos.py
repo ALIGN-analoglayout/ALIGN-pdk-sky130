@@ -348,6 +348,10 @@ class MOSGenerator(DefaultCanvas):
 
         #####   Pselect and Nwell Placement   #####
         self.addRegion( self.pselect, None, (1, -1), 0, (x_cells*self.gatesPerUnitCell+2*self.gateDummy*self.shared_diff-1, -1), y_cells* self.finsPerUnitCell)
-        self.addRegion( self.nwell, None, (1, -1), 0, (x_cells*self.gatesPerUnitCell+2*self.gateDummy*self.shared_diff-1, -1), y_cells* self.finsPerUnitCell+self.bodyswitch*self.pdk['Active']['Body_nfin'])
+        # FIX(nwell.2a): extend the n-well a few poly pitches past the pmos extent so that
+        # n-wells of pmos primitives the PnR places near each other MERGE (overlapping wells =
+        # one well, no inter-well spacing rule) instead of leaving a sub-1.27um near-miss gap.
+        # The well still encloses the (un-extended) pselect; only the well grows.
+        self.addRegion( self.nwell, None, (-3, -1), 0, (x_cells*self.gatesPerUnitCell+2*self.gateDummy*self.shared_diff+3, -1), y_cells* self.finsPerUnitCell+self.bodyswitch*self.pdk['Active']['Body_nfin'])
         if self.bodyswitch==1:self.addRegion( self.nselect, None, (1, -1), y_cells* self.finsPerUnitCell, (x_cells*self.gatesPerUnitCell+2*self.gateDummy*self.shared_diff-1, -1), y_cells* self.finsPerUnitCell+self.bodyswitch*self.pdk['Active']['Body_nfin'])
 
