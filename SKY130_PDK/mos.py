@@ -324,6 +324,12 @@ class MOSGenerator(DefaultCanvas):
                         _sel = 0 if 0 <= ((x_cells // 2) - x) <= 1 else 1
                     self._addMOS(x, y, x_cells, vt_type, names[_sel], False,  **parameters)
                     if self.bodyswitch==1:self._addBodyContact(x, y, x_cells, y_cells - 1, names[_sel])
+                elif pattern == 4: # ncc (non-common-centroid) — interdigitated fallback
+                    # FIX: the compiler requests 'ncc' for cascode/stacked groups; the mock PDK
+                    # had no implementation. Place A/B interdigitated (same as pattern 2) — a
+                    # valid, DRC-clean placement that preserves connectivity for LVS.
+                    self._addMOS(x, y, x_cells, vt_type, names[((x % 2) + (y % 2)) % 2], False,  **parameters)
+                    if self.bodyswitch==1:self._addBodyContact(x, y, x_cells, y_cells - 1, names[((x % 2) + (y % 2)) % 2])
                 else:
                     assert False, "Unknown pattern"
             self._connectDevicePins(y, y_cells, connections)
