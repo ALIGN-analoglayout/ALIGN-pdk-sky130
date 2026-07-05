@@ -132,13 +132,13 @@ def gen_param(subckt, primitives, pdk_dir):
 
         if 'NF' in mvalues[device_name].keys():
             for key in mvalues:
-                assert int(mvalues[key]["NF"]), f"unrecognized NF of device {key}:{mvalues[key]['NF']} in {name}"
-                assert int(mvalues[key]["NF"]) % 2 == 0, f"NF must be even for device {key}:{mvalues[key]['NF']} in {name}"
+                assert int(mvalues[key]["NF"]), f"unrecognized NF of device {key}:{mvalues[key]['NF']} in {subckt.name}"
+                assert int(mvalues[key]["NF"]) % 2 == 0, f"NF must be even for device {key}:{mvalues[key]['NF']} in {subckt.name}"
             name_arg = name_arg+'_NF'+str(int(mvalues[device_name]["NF"]))
 
         if 'M' in mvalues[device_name].keys():
             for key in mvalues:
-                assert int(mvalues[key]["M"]), f"unrecognized M of device {key}:{mvalues[key]['M']} in {name}"
+                assert int(mvalues[key]["M"]), f"unrecognized M of device {key}:{mvalues[key]['M']} in {subckt.name}"
                 if "PARALLEL" in mvalues[key].keys() and int(mvalues[key]['PARALLEL']) > 1:
                     mvalues[key]["PARALLEL"] = int(mvalues[key]['PARALLEL'])
                     mvalues[key]['M'] = int(mvalues[key]['M'])*int(mvalues[key]['PARALLEL'])
@@ -148,7 +148,7 @@ def gen_param(subckt, primitives, pdk_dir):
         logger.debug(f"Generating lef for {block_name}")
         if isinstance(size, int):
             for key in mvalues:
-                assert int(mvalues[device_name]["NFIN"]) == int(mvalues[key]["NFIN"]), f"W should be same for all devices in {name} {mvalues}"
+                assert int(mvalues[device_name]["NFIN"]) == int(mvalues[key]["NFIN"]), f"W should be same for all devices in {subckt.name} {mvalues}"
                 size_device = int(mvalues[key]["NF"])*int(mvalues[key]["M"])
                 size = size + size_device
             no_units = ceil(size / (2*len(mvalues)))  # Factor 2 is due to NF=2 in each unit cell; needs to be generalized
