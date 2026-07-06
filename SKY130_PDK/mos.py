@@ -285,9 +285,14 @@ class MOSGenerator(DefaultCanvas):
             self._xpins = collections.defaultdict(lambda: collections.defaultdict(list)) # inst:pin:m1tracks (Updated by self._addMOS)
             
             for x in range(x_cells):
-                if pattern == 0: # None (single transistor
+                if isinstance(pattern, (list, tuple)):
+                    # exact per-column device assignment (ratioed mirrors:
+                    # pattern[x] indexes names, built in generate_MOS_primitive)
+                    self._addMOS(x, y, x_cells, vt_type, names[pattern[x]], False, **parameters)
+                    if self.bodyswitch==1:self._addBodyContact(x, y, x_cells, y_cells - 1, names[pattern[x]])
+                elif pattern == 0: # None (single transistor
                     # TODO: Not sure this works without dummies. Currently:
-                    # A A A A A 
+                    # A A A A A
                     self._addMOS(x, y, x_cells, vt_type, names[0], False, **parameters)
                     if self.bodyswitch==1:self._addBodyContact(x, y, x_cells, y_cells - 1, names[0])
                 elif pattern == 1: # CC
@@ -310,8 +315,11 @@ class MOSGenerator(DefaultCanvas):
                     # B B B A A B B B
                     self._addMOS(x, y, x_cells, vt_type, names[0 if 0 <= ((x_cells // 2) - x) <= 1 else 1], False,  **parameters)
                     if self.bodyswitch==1:self._addBodyContact(x, y, x_cells, y_cells - 1, names[0 if 0 <= ((x_cells // 2) - x) <= 1 else 1])
+                elif pattern == 4: # NCC: left half A, right half B
+                    self._addMOS(x, y, x_cells, vt_type, names[0 if x < x_cells // 2 else 1], False, **parameters)
+                    if self.bodyswitch==1:self._addBodyContact(x, y, x_cells, y_cells - 1, names[0 if x < x_cells // 2 else 1])
                 else:
-                    assert False, "Unknown pattern"
+                    assert False, f"Unknown pattern {pattern} x_cells={x_cells} names={names}"
             self._connectDevicePins(y, y_cells, connections)
         self._connectNets(x_cells, y_cells) 
 

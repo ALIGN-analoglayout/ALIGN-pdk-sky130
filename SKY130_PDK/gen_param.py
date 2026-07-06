@@ -38,6 +38,16 @@ def add_primitive(primitives, block_name, block_args):
                     if y == 1:
                         break
                 pairs = limit_pairs((pairs))
+                mv = block_args.get('parameters') or {}
+                if len(mv) == 2:
+                    fpair = [int(v.get("NF", 1)) * int(v.get("M", 1)) for v in mv.values()]
+                    if fpair[0] != fpair[1]:
+                        # ratioed pair: keep only shapes whose column count
+                        # represents the ratio exactly (pattern is per-column)
+                        tot, fs = sum(fpair), min(fpair)
+                        ok = [(nx, ny) for nx, ny in pairs
+                              if nx * fs % tot == 0 and nx * fs >= tot]
+                        pairs = ok or [(block_args['x_cells'], block_args['y_cells'])]
                 for newx, newy in pairs:
                     concrete_name = f'{block_name}_X{newx}_Y{newy}'
                     if concrete_name not in primitives:
@@ -112,7 +122,10 @@ def gen_param(subckt, primitives, pdk_dir):
         add_primitive(primitives, block_name, block_args)
 
     else:
-        assert 'MOS' == generator_name, f'{generator_name} is not recognized'
+        # DoNotIdentify'd lone transistors arrive with their model name as
+        # the generator (NMOS_RVT/PMOS_LVT/...); they are plain MOS arrays.
+        assert 'MOS' in generator_name, f'{generator_name} is not recognized'
+        generator_name = 'MOS'
         if "vt_type" in design_config:
             vt = [vt.upper() for vt in design_config["vt_type"] if vt.upper() in subckt.elements[0].model]
         mvalues = {}
@@ -132,13 +145,13 @@ def gen_param(subckt, primitives, pdk_dir):
 
         if 'NF' in mvalues[device_name].keys():
             for key in mvalues:
-                assert int(mvalues[key]["NF"]), f"unrecognized NF of device {key}:{mvalues[key]['NF']} in {name}"
-                assert int(mvalues[key]["NF"]) % 2 == 0, f"NF must be even for device {key}:{mvalues[key]['NF']} in {name}"
+                assert int(mvalues[key]["NF"]), f"unrecognized NF of device {key}:{mvalues[key]['NF']} in {subckt.name}"
+                assert int(mvalues[key]["NF"]) % 2 == 0, f"NF must be even for device {key}:{mvalues[key]['NF']} in {subckt.name}"
             name_arg = name_arg+'_NF'+str(int(mvalues[device_name]["NF"]))
 
         if 'M' in mvalues[device_name].keys():
             for key in mvalues:
-                assert int(mvalues[key]["M"]), f"unrecognized M of device {key}:{mvalues[key]['M']} in {name}"
+                assert int(mvalues[key]["M"]), f"unrecognized M of device {key}:{mvalues[key]['M']} in {subckt.name}"
                 if "PARALLEL" in mvalues[key].keys() and int(mvalues[key]['PARALLEL']) > 1:
                     mvalues[key]["PARALLEL"] = int(mvalues[key]['PARALLEL'])
                     mvalues[key]['M'] = int(mvalues[key]['M'])*int(mvalues[key]['PARALLEL'])
@@ -148,7 +161,7 @@ def gen_param(subckt, primitives, pdk_dir):
         logger.debug(f"Generating lef for {block_name}")
         if isinstance(size, int):
             for key in mvalues:
-                assert int(mvalues[device_name]["NFIN"]) == int(mvalues[key]["NFIN"]), f"W should be same for all devices in {name} {mvalues}"
+                assert int(mvalues[device_name]["NFIN"]) == int(mvalues[key]["NFIN"]), f"W should be same for all devices in {subckt.name} {mvalues}"
                 size_device = int(mvalues[key]["NF"])*int(mvalues[key]["M"])
                 size = size + size_device
             no_units = ceil(size / (2*len(mvalues)))  # Factor 2 is due to NF=2 in each unit cell; needs to be generalized
@@ -161,12 +174,17 @@ def gen_param(subckt, primitives, pdk_dir):
             yval = square_y
             xval = int(no_units / square_y)
 
-        if 'SCM' in block_name:
-            if int(mvalues[device_name_all[0]]["NFIN"])*int(mvalues[device_name_all[0]]["NF"])*int(mvalues[device_name_all[0]]["M"]) != \
-                    int(mvalues[device_name_all[1]]["NFIN"])*int(mvalues[device_name_all[1]]["NF"])*int(mvalues[device_name_all[1]]["M"]):
-                square_y = 1
-                yval = square_y
-                xval = int(no_units / square_y)
+        if len(mvalues) == 2:
+            f0 = int(mvalues[device_name_all[0]]["NF"])*int(mvalues[device_name_all[0]]["M"])
+            f1 = int(mvalues[device_name_all[1]]["NF"])*int(mvalues[device_name_all[1]]["M"])
+            if f0 != f1:
+                # ratioed pair (SCM/CMC mirror): x_cells must carry the TRUE
+                # total unit count. The generic no_units above splits units
+                # equally between the pair, drawing ratioed mirrors ~1:1.
+                # generate_MOS_primitive builds an exact per-column pattern
+                # from each device's NF*M and skips its 2x doubling.
+                yval = 1
+                xval = ceil(size / 2)  # size = total fingers, 2 per unit
 
         block_args = {
             'primitive': generator_name,
