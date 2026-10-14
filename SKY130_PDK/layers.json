@@ -397,7 +397,31 @@
 },    
 
 {
+"Layer": "Rpm",
+"GdsLayerNo": 86,
+"GdsDatatype": {"Draw": 20}
+},
+
+{
+"Layer": "Polyres",
+"GdsLayerNo": 66,
+"GdsDatatype": {"Draw": 13}
+},
+
+{
+"Layer": "Res",
+"unit_res": 320,
+"width": 350
+},
+
+{
 "Layer": "Cap",
+"m1Pitch": 460,
+"m1Width": 260,
+"m2Pitch": 460,
+"m2Width": 260,
+"m3Pitch": 460,
+"m3Width": 260,
 "m4Width": 450,
 "m5Width": 450
 }

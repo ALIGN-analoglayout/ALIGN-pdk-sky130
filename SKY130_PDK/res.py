@@ -1,115 +1,161 @@
+import logging
+import math
 from align.primitive.default.canvas import DefaultCanvas
 from align.cell_fabric.generators import *
 from align.cell_fabric.grid import *
 
-import logging
 logger = logging.getLogger(__name__)
 
 class ResGenerator(DefaultCanvas):
 
-    def __init__(self, pdk, fin, finDummy):
+    def __init__(self, pdk, fin=1, finDummy=0):
         super().__init__(pdk)
-        self.finsPerUnitCell = fin + 2*finDummy
-        # TODO: Generalize these
-        self.m1res = self.addGen( Wire( 'm1res', 'M1', 'v',
-                                     clg=ColoredCenterLineGrid( colors=['c1','c2'], pitch=self.pdk['Cap']['m1Pitch'], width=self.pdk['Cap']['m1Width']),
-                                     spg=EnclosureGrid( pitch=self.pdk['M2']['Pitch'], stoppoint=self.pdk['V1']['VencA_L'] +self.pdk['Cap']['m2Width']//2, check=True)))
-
-        self.m1res2 = self.addGen( Wire( 'm1res2', 'M1', 'h',
-                                     clg=ColoredCenterLineGrid( colors=['c1','c2'], pitch=self.pdk['M2']['Pitch'], width=self.pdk['Cap']['m1Width']),
-                                     spg=EnclosureGrid( pitch=self.pdk['Cap']['m1Pitch'], stoppoint=self.pdk['Cap']['m1Width']//2, check=False)))
-
-        self.m2res = self.addGen( Wire( 'm2res', 'M2', 'h',
-                                     clg=ColoredCenterLineGrid( colors=['c1','c2'], pitch=self.pdk['M2']['Pitch'], width=self.pdk['Cap']['m2Width']),
-                                     spg=EnclosureGrid( pitch=self.pdk['Cap']['m1Pitch'], stoppoint=self.pdk['V1']['VencA_H'] + self.pdk['Cap']['m1Width']//2, check=False)))
-
-        self.m2res2 = self.addGen( Wire( 'm2res2', 'M2', 'h',
-                                      clg=ColoredCenterLineGrid( colors=['c1','c2'], pitch=self.pdk['Cap']['m2Pitch'], width=self.pdk['Cap']['m2Width']),
-                                      spg=EnclosureGrid( pitch=self.pdk['Cap']['m1Pitch'], stoppoint=self.pdk['V1']['VencA_H'] + self.pdk['Cap']['m1Width']//2)))
-
-        self.m3res = self.addGen( Wire( 'm3res', 'M3', 'v',
-                                     clg=ColoredCenterLineGrid( colors=['c1','c2'], pitch=self.pdk['Cap']['m3Pitch'], width=self.pdk['Cap']['m3Width']),
-                                     spg=EnclosureGrid(pitch=self.pdk['M2']['Pitch'], stoppoint=self.pdk['V2']['VencA_H'] + self.pdk['Cap']['m2Width']//2, check=True)))
-
-        self.v1res = self.addGen( Via( 'v1res', 'V1',
-                                        h_clg=self.m2res.clg, v_clg=self.m1res.clg,
-                                        WidthX=self.v1.WidthX, WidthY=self.v1.WidthY,
-                                        h_ext=self.v1.h_ext, v_ext=self.v1.v_ext))
-        self.v2res = self.addGen( Via( 'v2res', 'V2', h_clg=self.m2res.clg, v_clg=self.m3res.clg,
-                                        WidthX=self.v2.WidthX, WidthY=self.v2.WidthY,
-                                        h_ext=self.v2.h_ext, v_ext=self.v2.v_ext))
-
-        self.Rboundary = self.addGen( Region( 'Rboundary', 'Rboundary', h_grid=self.m2.clg, v_grid=self.m1.clg))
+        self.finsPerUnitCell = fin + 2 * finDummy
+        self.Rboundary = self.addGen(Region('Rboundary', 'Rboundary', h_grid=self.m2.clg, v_grid=self.m1.clg))
+        self.poly = self.addGen(Region('poly', 'Poly', h_grid=self.m2.clg, v_grid=self.m1.clg))
+        self.rpm = self.addGen(Region('rpm', 'Rpm', h_grid=self.m2.clg, v_grid=self.m1.clg))
+        self.polyres = self.addGen(Region('polyres', 'Polyres', h_grid=self.m2.clg, v_grid=self.m1.clg))
+        self.pselect = self.addGen(Region('pselect', 'Pselect', h_grid=self.m2.clg, v_grid=self.m1.clg))
+        self.npc = self.addGen(Region('npc', 'Npc', h_grid=self.m2.clg, v_grid=self.m1.clg))
+        self.v0 = self.addGen(Region('v0', 'V0', h_grid=self.m2.clg, v_grid=self.m1.clg))
 
     def addResArray(self, x_cells, y_cells, height, unit_res):
-
         for x in range(x_cells):
             for y in range(y_cells):
-                self._addRes(x, y, height, unit_res, (x == x_cells-1) and (y == y_cells-1))
+                self._addRes(x, y, height, unit_res, draw_boundary=(x == x_cells - 1) and (y == y_cells - 1))
 
-    def _addRes( self, x, y, height, unit_res, draw_boundary=True):
+    def _addRes(self, x, y, height, unit_res, draw_boundary=True):
+        width_nm = 350
+        r_sheet = 320.0
+        res_val = float(unit_res) if (unit_res is not None and unit_res > 0) else 5000.0
 
-        y_length = self.finsPerUnitCell * self.pdk['Fin']['Pitch'] * height
-        assert y_length != 0, (self.finsPerUnitCell, self.pdk['Fin']['Pitch'], height)
-        # SMB ??? Hard coded value
-        res_per_length = 67
-        x_number = max( 1, int(round(((1000*unit_res)/(res_per_length*y_length)))))
+        # Resistor body length in nm
+        l_res = max(500, int(round((res_val / r_sheet) * width_nm)))
+        l_res = int(round(l_res / 10.0) * 10)
 
-        # ga = 2 if x_number == 1 else 1 ## when number of wires is 2 then large spacing req. so contact can be placed without a DRC error 
-        # x_length = (x_number - 1) *ga*self.pdk['Cap']['m1Pitch']
+        m1_p = self.pdk['M1']['Pitch']  # 460 nm
+        m2_p = self.pdk['M2']['Pitch']  # 460 nm
 
-        y_number = int(2 *round(((y_length+self.pdk['Cap']['m2Pitch']-self.pdk['Cap']['m2Width'])/(2.0*self.pdk['Cap']['m2Pitch']))))
+        x_track_pitch = 4 * m1_p  # 1840 nm
+        x_center = x * x_track_pitch + 2 * m1_p
 
-        last_y1_track = ((y_number-1)*self.pdk['Cap']['m2Pitch']+self.pdk['M2']['Pitch']-1)//self.pdk['M2']['Pitch']
-        last_x_track = x_number - 1
+        # Snap pad length to multiples of m2_p: >= 2.0 um to satisfy licon.1c
+        pad_len = 5 * m2_p  # 2300 nm
 
-        m2factor = 2 ### number of m2-tracks (m2factor-1)in between two unitcells in y-direction
-        m1factor = 3
+        y_poly_start = 2 * m2_p  # 920 nm
+        y_res_body_start = y_poly_start + pad_len
+        y_res_body_end = y_res_body_start + l_res
 
-        if (y_number-1) % 2 != last_y1_track % 2:
-            last_y1_track += 1 # so the last color is compatible with the external view of the cell
+        # Bottom M2 pin track
+        y_bot_via = y_poly_start + 2 * m2_p  # 1840 nm (on grid)
 
-        if last_y1_track % 2 == 1:
-            m2factor += 1 # so colors match in arrayed blocks
+        # Top M2 pin track
+        y_top_track = int(math.ceil((y_res_body_end + m2_p) / float(m2_p)))
+        y_top_via = y_top_track * m2_p  # on grid
 
-        grid_cell_x_pitch = m1factor + last_x_track
-        grid_cell_y_pitch = m2factor + last_y1_track
+        y_poly_end = max(y_res_body_end + pad_len, y_top_via + 2 * m2_p)
 
-        grid_y0 = y*grid_cell_y_pitch
-        grid_y1 = grid_y0 + last_y1_track
+        # 1. Poly stripe (Layer 66/20)
+        self.transform_and_add({
+            'layer': 'Poly',
+            'netName': None,
+            'rect': [x_center - width_nm // 2, y_poly_start, x_center + width_nm // 2, y_poly_end],
+            'netType': 'drawing'
+        })
 
-        for i in range(x_number):
-            (k, p) = (2*i, 1) if x_number==2 else (i, 0)
-            grid_x = k + x*grid_cell_x_pitch
+        # 2. RPM (Layer 86/20) covers all poly
+        self.transform_and_add({
+            'layer': 'Rpm',
+            'netName': None,
+            'rect': [x_center - 375, y_poly_start - 200, x_center + 375, y_poly_end + 200],
+            'netType': 'drawing'
+        })
 
-            self.addWire( self.m1res, None, grid_x, (grid_y0, -1), (grid_y1, 1))
-            if i < x_number-1:
-                grid_yh = ((i+1)%2)*last_y1_track
-                self.addWire( self.m1res2, None, grid_yh, (i, -1), (i+p+1, 1))
+        # 3. Polyres (Layer 66/13) marking the precision resistor body
+        self.transform_and_add({
+            'layer': 'Polyres',
+            'netName': None,
+            'rect': [x_center - width_nm // 2, y_res_body_start, x_center + width_nm // 2, y_res_body_end],
+            'netType': 'drawing'
+        })
 
-#
-# Build the narrow m2 pitch grid starting at grid_cell_y_pitch*y in standard m2 pitch grids (m2.clg)
-#
-        m2n = Wire( self.m2res2.nm, self.m2res2.layer, self.m2res2.direction,
-                    clg=self.m2res2.clg.copyShift( self.m2res.clg.value( grid_cell_y_pitch*y)[0]),
-                    spg=self.m2res2.spg)
+        # 4. Pselect (94/20) and Npc (95/20)
+        self.transform_and_add({
+            'layer': 'Pselect',
+            'netName': None,
+            'rect': [x_center - 500, y_poly_start - 300, x_center + 500, y_poly_end + 300],
+            'netType': 'drawing'
+        })
+        self.transform_and_add({
+            'layer': 'Npc',
+            'netName': None,
+            'rect': [x_center - 375, y_poly_start - 200, x_center + 375, y_poly_end + 200],
+            'netType': 'drawing'
+        })
 
-        grid_x0 = x*grid_cell_x_pitch
-        grid_x1 = grid_x0 + last_x_track
-        grid_y = (x_number%2)*last_y1_track
+        # 5. Bottom contacts (MINUS terminal)
+        y_bot_licon_start = y_poly_start + 40
+        y_bot_licon_end = y_res_body_start - 40
+        self.transform_and_add({
+            'layer': 'V0',
+            'netName': 'MINUS',
+            'rect': [x_center - 95, y_bot_licon_start, x_center + 95, y_bot_licon_end],
+            'netType': 'drawing'
+        })
+        self.transform_and_add({
+            'layer': 'M1',
+            'netName': 'MINUS',
+            'rect': [x_center - 175, y_poly_start, x_center + 175, y_res_body_start],
+            'netType': 'drawing'
+        })
+        self.transform_and_add({
+            'layer': 'V1',
+            'netName': 'MINUS',
+            'rect': [x_center - 85, y_bot_via - 85, x_center + 85, y_bot_via + 85],
+            'netType': 'drawing'
+        })
+        self.transform_and_add({
+            'layer': 'M2',
+            'netName': 'MINUS',
+            'rect': [x_center - 230, y_bot_via - 130, x_center + 230, y_bot_via + 130],
+            'netType': 'pin'
+        })
 
-        pin = 'PLUS'
-        self.addWire( m2n, 'PLUS', 0, (-4, -1), (0, 1), netType = 'pin')
-        self.addVia( self.v1res, None, 0, 0)
-        pin = 'MINUS'
-        self.addWire( self.m2res, 'MINUS', grid_y, (grid_x1+p, -1), (grid_x1+p+4, 1), netType = 'pin')
-        self.addVia( self.v1res, None, grid_x1+p, grid_y)
+        # 6. Top contacts (PLUS terminal)
+        y_top_licon_start = y_res_body_end + 40
+        y_top_licon_end = y_poly_end - 40
+        self.transform_and_add({
+            'layer': 'V0',
+            'netName': 'PLUS',
+            'rect': [x_center - 95, y_top_licon_start, x_center + 95, y_top_licon_end],
+            'netType': 'drawing'
+        })
+        self.transform_and_add({
+            'layer': 'M1',
+            'netName': 'PLUS',
+            'rect': [x_center - 175, y_res_body_end, x_center + 175, y_poly_end],
+            'netType': 'drawing'
+        })
+        self.transform_and_add({
+            'layer': 'V1',
+            'netName': 'PLUS',
+            'rect': [x_center - 85, y_top_via - 85, x_center + 85, y_top_via + 85],
+            'netType': 'drawing'
+        })
+        self.transform_and_add({
+            'layer': 'M2',
+            'netName': 'PLUS',
+            'rect': [x_center - 230, y_top_via - 130, x_center + 230, y_top_via + 130],
+            'netType': 'pin'
+        })
 
+        # 7. Boundary
         if draw_boundary:
-            self.addRegion( self.boundary, 'boundary', -4, -1,
-                            last_x_track  + x * grid_cell_x_pitch + 4 + p,
-                            last_y1_track + y * grid_cell_y_pitch + 1)
-
-            self.addRegion( self.Rboundary, 'Rboundary', -1, -1,
-                            last_x_track  + x * grid_cell_x_pitch + 4 + p,
-                            last_y1_track + y * grid_cell_y_pitch + 1)
+            total_width = (x + 1) * x_track_pitch
+            total_height = int(math.ceil((y_poly_end + m2_p) / float(m2_p))) * m2_p
+            self.transform_and_add({
+                'layer': 'Boundary',
+                'netName': 'Boundary',
+                'rect': [0, 0, total_width, total_height],
+                'netType': 'drawing'
+            })
